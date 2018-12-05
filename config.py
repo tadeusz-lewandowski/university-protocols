@@ -1,0 +1,3 @@
+SERVER_IP = 'localhost'
+PORT = 3000
+BUFFER_SIZE = 10000
