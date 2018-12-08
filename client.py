@@ -25,16 +25,16 @@ diffie_hellman.generate_shared_private_key()
 SECRET = diffie_hellman.get_shared_private_key()
 
 print('shared secret', SECRET)
+aes = AESCipher(str(SECRET))
 
 #signature procedure
-(pubkey, privkey) = rsa.newkeys(512)
-messanger.send_message(pickle.dumps(pubkey))
+(public_key, private_key) = rsa.newkeys(512)
+messanger.send_message(pickle.dumps(public_key))
 
-aes = AESCipher(str(SECRET))
 message = 'Hello!'
 encrypted_message = aes.encrypt(message)
 
-signature = rsa.sign(encrypted_message, privkey, 'SHA-1')
+signature = rsa.sign(encrypted_message, private_key, 'SHA-1')
 
 final_message = (encrypted_message, signature)
 messanger.send_message(pickle.dumps(final_message))

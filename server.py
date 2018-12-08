@@ -28,7 +28,6 @@ diffie_hellman.generate_shared_private_key()
 SECRET = diffie_hellman.get_shared_private_key()
 
 print('shared secret', SECRET)
-
 aes = AESCipher(str(SECRET))
 
 #signature procedure
