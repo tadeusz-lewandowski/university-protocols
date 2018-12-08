@@ -3,7 +3,9 @@ from  config import SERVER_IP, PORT
 from Messanger import Messanger
 from diffie_hellman.DiffieHellman import DiffieHellman
 from AES import AESCipher
-
+import rsa
+import pickle
+import sys
 socket = _s.socket(_s.AF_INET, _s.SOCK_STREAM)
 socket.bind((SERVER_IP, PORT))
 print('Listening for connections...')
@@ -29,7 +31,21 @@ print('shared secret', SECRET)
 
 aes = AESCipher(str(SECRET))
 
-data = aes.decrypt(messanger.get_message())
+#signature procedure
+rsa_public_key = pickle.loads(messanger.get_message())
+print(rsa_public_key)
 
-print('Decrypted: ', data)
-messanger.send_message(aes.encrypt(data))
+received_message = pickle.loads(messanger.get_message())
+print(received_message)
+message = received_message[0]
+signature = received_message[1]
+
+try:
+    verify_status = rsa.verify(message, signature, rsa_public_key)
+    data = aes.decrypt(message)
+    print('decoded', data)
+except rsa.pkcs1.VerificationError:
+    print('verification failed')
+except:
+    print('error')
+    print(sys.exc_info()[0])

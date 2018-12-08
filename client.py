@@ -3,6 +3,8 @@ from config import SERVER_IP, PORT
 from Messanger import Messanger
 from diffie_hellman.DiffieHellman import DiffieHellman
 from AES import AESCipher
+import rsa
+import pickle
 
 socket = _s.socket(_s.AF_INET, _s.SOCK_STREAM)
 print('Waiting for connection...')
@@ -24,8 +26,15 @@ SECRET = diffie_hellman.get_shared_private_key()
 
 print('shared secret', SECRET)
 
-aes = AESCipher(str(SECRET))
-messanger.send_message(aes.encrypt('Hello'))
-data = aes.decrypt(messanger.get_message())
+#signature procedure
+(pubkey, privkey) = rsa.newkeys(512)
+messanger.send_message(pickle.dumps(pubkey))
 
-print('Echo:', data)
+aes = AESCipher(str(SECRET))
+message = 'Hello!'
+encrypted_message = aes.encrypt(message)
+
+signature = rsa.sign(encrypted_message, privkey, 'SHA-1')
+
+final_message = (encrypted_message, signature)
+messanger.send_message(pickle.dumps(final_message))
